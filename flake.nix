@@ -1,30 +1,45 @@
 {
-    description = "KushanaOS flake";
+  description = "KushanaOS config";
 
-    inputs = {
-        nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-        nur.url = "github:nix-community/NUR";
+  inputs = {
+    nixpkgs.url = "nixpkgs/nixos-unstable";
+  
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
+
+  outputs = { self, nixpkgs, home-manager, ... }@inputs: 
+  
+  let 
+    inherit (nixpkgs) lib;
+    
+    util = import ./lib {
+      inherit system pkgs home-manager lib; overlays = (pkgs.overlays);
     };
 
-    outputs = inputs@{ self, nixpkgs, nur, ...} : {
-        packages.x86_64-linux = let
-            pkgs = import nixpkgs { 
-                system = "x86_64-linux";
-                config.allowUnfree = true;
-            };
-            in {
-                nix = nixpkgs.nix;
-            };
+    inherit (util) user;
+    inherit (util) host;
 
-            nixosConfigurations = {
-                teto = nixpkgs.lib.nixosSystem {
-                    system = "x86_64-linux";
-                    extraArgs = { inherit nur; };
-                    modules = [
-                        self.nixosModules.overlay
-                        ./configs/configuration-teto.nix
-                    ];
-                };
-            };
+    pkgs = import nixpkgs {
+      inherit system;
+      config.allowUnfree = true;
     };
+    
+    system = "x86_64-linux";
+    in {
+      homeManagerConfigurations = {
+        jd = user.mkHMUser {
+          #
+        };
+      };
+
+      nixosConfigurations = {
+        laptop = host.mkHost {
+          #
+        };
+      };
+  };
+
 }
