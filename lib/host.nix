@@ -24,7 +24,25 @@ with builtins;
         environment.etc = {
           "hmsystemdata.json".text = toJSON userCfg;
         };
-  }
+        networking.hostName = "${name}";
+        networking.interfaces = networkCfg;
+        networking.wireless.interfaces = wifi;
+        
+        networking.networkmanager.enable = true;
+        networking.useDHCP = false;
 
-https://jdisaacs.com/blog/nixos-config/
+        boot.initrd.availableKernelModules = initrdMods;
+        boot.kernelModules = kernelMods;
+        boot.kernelParams = kernelParams;
+        boot.kernelPackages = kernelPackages;
+
+        nixpkgs.pkgs = pkgs;
+        nix.maxJobs = lib.mkDefault cpuCores;
+
+        system.stateVersion = "22.05";
+      }
+  ];
+};
+  
+# https://jdisaacs.com/blog/nixos-config/
 }

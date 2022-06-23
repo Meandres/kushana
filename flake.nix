@@ -30,14 +30,29 @@
     system = "x86_64-linux";
     in {
       homeManagerConfigurations = {
-        jd = user.mkHMUser {
+        Meandres = user.mkHMUser {
           #
         };
       };
 
       nixosConfigurations = {
-        laptop = host.mkHost {
-          #
+        work_laptop = host.mkHost {
+          name = "yupa";
+          NICs = [ "enp0s31f6" "wlp1s0"];
+          kernelPackages = pkgs.linuxPackages;
+          initrdMods = [ "xhci_pci" "ahci" "usb_storage" "sd_mod" "rtsx_pci_sdmmc" ];
+          kernelMods = [ "kvm-intel" ];
+          kernelParams = [];
+          systemConfig = {
+            # To fill
+          };
+          users = [{
+            name = "Meandres";
+            groups = [ "wheel" "networkmanager" "docker" ];
+            uid = 1000;
+            shell = pkgs.bash;
+          }];
+         cpuCores = 4;
         };
       };
   };
